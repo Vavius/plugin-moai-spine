@@ -9,7 +9,10 @@ project ( moai-spine )
   )
 
   # Use all cpp files in directory as source code
-  file ( GLOB MOAI_SPINE_SRC "${PLUGIN_ROOT}/*.cpp" )
+  file ( GLOB MOAI_SPINE_SRC 
+    "${PLUGIN_ROOT}/*.cpp" 
+    "${PLUGIN_ROOT}/*.h" 
+  )
 
 
   add_library ( moai-spine STATIC ${MOAI_SPINE_SRC} )
