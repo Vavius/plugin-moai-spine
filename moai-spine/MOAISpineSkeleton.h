@@ -31,19 +31,16 @@ class MOAISpineSkeleton :
 	public MOAIAction {
 private:
 	
-	bool			mDebugSlots;
-	bool			mDebugBones;
-	bool			mBoundsDirty;
+    bool            mComputeBounds;
 	ZLBox			mSkeletonBounds;
-	
-	spSkeleton*		mSkeleton;
-	spAnimationState* mAnimationState;
-	MOAISpineBone*	mRootBone;
+        
+	spSkeleton*         mSkeleton;
+	spAnimationState*   mAnimationState;
+	MOAISpineBone*      mRootBone;
 		
 	MOAILuaSharedPtr < MOAISpineSkeletonData > mSkeletonData;
-	
-	ZLLeanArray < MOAIQuadBrush > mQuads;
-	
+	ZLLeanStack < float, 32 > mVertices;
+        
 	typedef STLMap < STLString, MOAISpineBone* >::iterator BoneTransformIt;
 	STLMap < STLString, MOAISpineBone* > mBoneTransformMap;
 	
@@ -61,6 +58,7 @@ private:
 	static int		_setAnimation			( lua_State* L );
 	static int		_setAttachment			( lua_State* L );
 	static int		_setBonesToSetupPose	( lua_State* L );
+    static int		_setComputeBounds       ( lua_State* L );
 	static int		_setFlip				( lua_State* L );
 	static int		_setMix					( lua_State* L );
 	static int		_setSkin				( lua_State* L );
@@ -100,7 +98,7 @@ public:
 	void			RegisterLuaFuncs		( MOAILuaState& state );
 	void			SetAnimation			( int trackId, cc8* name, bool loop, float delay );
 	void			SetMix					( cc8* fromName, cc8* toName, float duration );
-	void			UpdateBoundsAndQuads	();
+    void			UpdateBounds            ();
 	void			UpdateSkeleton			();
 };
 

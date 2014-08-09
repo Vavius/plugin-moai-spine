@@ -229,7 +229,7 @@ int MOAISpineSkeleton::_setAttachment ( lua_State* L ) {
 		state.Push ( false );
 		return 1;
 	}
-	state.Push ( (bool) spSkeleton_setAttachment ( self->mSkeleton, slotName, attachmentName ));
+	state.Push (( bool ) spSkeleton_setAttachment ( self->mSkeleton, slotName, attachmentName ));
 	return 1;
 }
 
@@ -248,7 +248,25 @@ int MOAISpineSkeleton::_setBonesToSetupPose	( lua_State* L ) {
 	}
 	spSkeleton_setBonesToSetupPose ( self->mSkeleton );
 	self->UpdateSkeleton ();
+    self->UpdateBounds ();
 	return 0;
+}
+
+//----------------------------------------------------------------//
+/**	@name	setComputeBounds
+    @text   Flag controlling whether to recompute bounds each frame.
+            When disabled, bounds will be initialized to setup pose.
+            Default is false.
+
+    @in		MOAISpineSkeleton self
+    @in		bool	computeBounds
+    @out	nil
+*/
+int MOAISpineSkeleton::_setComputeBounds ( lua_State *L ) {
+	MOAI_LUA_SETUP ( MOAISpineSkeleton, "U" );
+	
+    self->mComputeBounds = state.GetValue < bool >( 2, false );
+    return 0;
 }
 
 //----------------------------------------------------------------//
@@ -301,7 +319,7 @@ int MOAISpineSkeleton::_setMix ( lua_State *L ) {
 		MOAIPrint ( "MOAISpineSkeleton not initialized \n" );
 		return 0;
 	}
-	self->SetMix( fromName, toName, duration );
+	self->SetMix ( fromName, toName, duration );
 	
 	return 0;
 }
@@ -323,7 +341,9 @@ int MOAISpineSkeleton::_setSkin	( lua_State* L ) {
 		return 0;
 	}
 	spSkeleton_setSkinByName ( self->mSkeleton, skinName );
-	spSkeleton_setSlotsToSetupPose( self->mSkeleton );
+	spSkeleton_setSlotsToSetupPose ( self->mSkeleton );
+    self->UpdateSkeleton ();
+    self->UpdateBounds ();
 	return 0;
 }
 
@@ -341,6 +361,8 @@ int MOAISpineSkeleton::_setSlotsToSetupPose	( lua_State* L ) {
 		return 0;
 	}
 	spSkeleton_setSlotsToSetupPose ( self->mSkeleton );
+    self->UpdateSkeleton ();
+    self->UpdateBounds ();
 	return 0;
 }
 
@@ -359,6 +381,7 @@ int MOAISpineSkeleton::_setToSetupPose ( lua_State* L ) {
 	}
 	spSkeleton_setToSetupPose ( self->mSkeleton );
 	self->UpdateSkeleton ();
+    self->UpdateBounds ();
 	return 0;
 }
 
@@ -438,23 +461,81 @@ void MOAISpineSkeleton::Draw ( int subPrimID ) {
 	gfxDevice.SetVertexTransform ( MOAIGfxDevice::VTX_WORLD_TRANSFORM, this->GetLocalToWorldMtx ());
 	gfxDevice.SetVertexMtxMode ( MOAIGfxDevice::VTX_STAGE_MODEL, MOAIGfxDevice::VTX_STAGE_PROJ );
 	gfxDevice.SetUVMtxMode ( MOAIGfxDevice::UV_STAGE_MODEL, MOAIGfxDevice::UV_STAGE_TEXTURE );
-
-	MOAIQuadBrush::BindVertexFormat ( gfxDevice );
-	
+    
 	MOAIBlendMode normal;
 	MOAIBlendMode additive;
 	normal.SetBlend ( MOAIBlendMode::BLEND_NORMAL );
 	additive.SetBlend ( MOAIBlendMode::BLEND_ADD );
-
-	u32 size = this->mQuads.Size ();
-	for ( u32 i = 0; i < size; ++i ) {
+    
+    MOAIQuadBrush brush;
+    brush.BindVertexFormat ( gfxDevice );
+    
+	for ( u32 i = 0; i < mSkeleton->slotCount; ++i ) {
 		spSlot* slot = mSkeleton->drawOrder [ i ];
+        if ( !slot->attachment ) {
+            continue;
+        }
 		
-		if ( !slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION)
-			continue;
-		
-		spRegionAttachment *attachment = (spRegionAttachment*) slot->attachment;
-		MOAITexture* texture = (MOAITexture*) ((spAtlasRegion*) attachment->rendererObject)->page->rendererObject;
+        MOAITexture* texture;
+        float*  uvs = 0;
+        int     trianglesCount = 0;
+        int*    triangles = 0;
+        float r, g, b, a;
+        
+        switch ( slot->attachment->type ) {
+            case SP_ATTACHMENT_REGION: {
+                spRegionAttachment *attachment = ( spRegionAttachment* ) slot->attachment;
+                texture = ( MOAITexture* ) (( spAtlasRegion* ) attachment->rendererObject )->page->rendererObject;
+                uvs = attachment->uvs;
+                
+                r = attachment->r;
+                g = attachment->g;
+                b = attachment->b;
+                a = attachment->a;
+                
+                mVertices.SetTop ( 8 );
+                spRegionAttachment_computeWorldVertices ( attachment, mSkeleton->x, mSkeleton->y, slot->bone, mVertices );
+                break;
+            }
+                
+            case SP_ATTACHMENT_MESH: {
+                spMeshAttachment *attachment = ( spMeshAttachment* ) slot->attachment;
+                texture = ( MOAITexture* ) (( spAtlasRegion* ) attachment->rendererObject )->page->rendererObject;
+                uvs = attachment->uvs;
+                triangles = attachment->triangles;
+                trianglesCount = attachment->trianglesCount;
+
+                r = attachment->r;
+                g = attachment->g;
+                b = attachment->b;
+                a = attachment->a;
+                
+                mVertices.SetTop ( attachment->verticesCount );
+                spMeshAttachment_computeWorldVertices ( attachment, mSkeleton->x, mSkeleton->y, slot, mVertices );
+                break;
+            }
+                
+            case SP_ATTACHMENT_SKINNED_MESH: {
+                spSkinnedMeshAttachment *attachment = ( spSkinnedMeshAttachment* ) slot->attachment;
+                texture = ( MOAITexture* ) (( spAtlasRegion* ) attachment->rendererObject )->page->rendererObject;
+                uvs = attachment->uvs;
+                triangles = attachment->triangles;
+                trianglesCount = attachment->trianglesCount;
+
+                r = attachment->r;
+                g = attachment->g;
+                b = attachment->b;
+                a = attachment->a;
+                
+                mVertices.SetTop ( attachment->uvsCount );
+                spSkinnedMeshAttachment_computeWorldVertices ( attachment, mSkeleton->x, mSkeleton->y, slot, mVertices );
+                break;
+            }
+                
+            default:
+                continue;
+                break;
+        }
 		
 		gfxDevice.SetTexture ( texture );
 		
@@ -465,18 +546,37 @@ void MOAISpineSkeleton::Draw ( int subPrimID ) {
 			gfxDevice.SetBlendMode ( normal );
 		}
 		
-		float a = slot->skeleton->a * slot->a;
-		float r = slot->skeleton->r * slot->r;
-		float g = slot->skeleton->g * slot->g;
-		float b = slot->skeleton->b * slot->b;
+        a = mSkeleton->a * slot->a * a;
+		r = mSkeleton->r * slot->r * r;
+		g = mSkeleton->g * slot->g * g;
+		b = mSkeleton->b * slot->b * b;
 		
 		ZLColorVec slotColor (r, g, b, a);
 		ZLColorVec baseColor = this->mColor;
 		slotColor.Modulate ( baseColor );
 		gfxDevice.SetPenColor ( slotColor );
 		
-		MOAIQuadBrush& quad = mQuads [ i ];
-		quad.Draw ();
+        if ( trianglesCount > 0 ) {
+            // TODO: Horrible to render meshes like this
+            // Better solution would be updating MOAIGfxDevice to use VBO and IBO internally
+            for ( u32 i = 0; i < trianglesCount; i += 3 ) {
+                gfxDevice.BeginPrim ();
+                
+                for ( u32 j = 0; j < 3; ++j ) {
+                    int idx = triangles [ i + j ];
+                    gfxDevice.WriteVtx ( mVertices [ idx * 2 ], mVertices [ idx * 2 + 1 ], 0 );
+                    gfxDevice.WriteUV ( uvs [ idx * 2 ], uvs [ idx * 2 + 1 ] );
+                    gfxDevice.WriteFinalColor4b ();
+                }
+                
+                gfxDevice.EndPrim ();
+            }
+        }
+        else {
+            brush.SetVerts ( mVertices );
+            brush.SetUVs ( uvs );
+            brush.Draw ();
+        }
 	}
 }
 
@@ -501,22 +601,19 @@ u32 MOAISpineSkeleton::GetPropBounds ( ZLBox &bounds ) {
 		return MOAIProp::BOUNDS_EMPTY;
 	}
 	
-	this->UpdateBoundsAndQuads ();
-	bounds.Init ( mSkeletonBounds );
-	
-	return MOAIProp::BOUNDS_OK;
+    if ( this->mComputeBounds ) {
+        this->UpdateBounds ();
+    }
+    bounds.Init ( mSkeletonBounds );
+    return MOAIProp::BOUNDS_OK;
 }
 
 //----------------------------------------------------------------//
 void MOAISpineSkeleton::Init ( spSkeletonData *skeletonData ) {
 	
 	mSkeleton = spSkeleton_create ( skeletonData );
-	
-	u32 total = mSkeleton->slotCount;
-	mQuads.Init ( total );
-	
+		
 	this->UpdateSkeleton ();
-	this->UpdateBoundsAndQuads ();
 }
 
 //----------------------------------------------------------------//
@@ -534,13 +631,11 @@ bool MOAISpineSkeleton::IsDone () {
 
 //----------------------------------------------------------------//
 MOAISpineSkeleton::MOAISpineSkeleton ():
-	mDebugSlots ( false ),
-    mDebugBones ( false ),
-    mBoundsDirty ( true ),
+    mComputeBounds ( false ),
     mSkeleton ( 0 ),
     mAnimationState ( 0 ),
     mRootBone ( 0 ) {
-	
+        
 	RTTI_BEGIN
 		RTTI_EXTEND ( MOAIProp )
 		RTTI_EXTEND ( MOAIAction )
@@ -549,8 +644,6 @@ MOAISpineSkeleton::MOAISpineSkeleton ():
 
 //----------------------------------------------------------------//
 MOAISpineSkeleton::~MOAISpineSkeleton () {
-	mQuads.Clear ();
-	
 	if ( mRootBone ) {
 		mRootBone->SetAsRootBone ( 0 );
 	}
@@ -678,6 +771,7 @@ void MOAISpineSkeleton::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "setAnimation", 			_setAnimation },
 		{ "setAttachment", 			_setAttachment },
 		{ "setBonesToSetupPose", 	_setBonesToSetupPose },
+        { "setComputeBounds",       _setComputeBounds },
 		{ "setFlip", 				_setFlip },
 		{ "setMix", 				_setMix },
 		{ "setSkin", 				_setSkin },
@@ -708,58 +802,63 @@ void MOAISpineSkeleton::SetMix ( cc8* fromName, cc8* toName, float duration ) {
 }
 
 //----------------------------------------------------------------//
-void MOAISpineSkeleton::UpdateBoundsAndQuads () {
-	if ( !mBoundsDirty ) {
-		return;
-	}
-	mBoundsDirty = false;
-	
-	float minX = FLT_MAX, minY = FLT_MAX, maxX = -FLT_MAX, maxY = -FLT_MAX;
-	float vertices[8];
-	
-	u32 size = this->mQuads.Size ();
-	for ( u32 i = 0; i < size; ++i ) {
+void MOAISpineSkeleton::UpdateBounds () {
+
+    mSkeletonBounds.Init ( FLT_MAX, -FLT_MAX, -FLT_MAX, FLT_MAX, 0.f, 0.f );
+    for ( u32 i = 0; i < mSkeleton->slotCount; ++i ) {
 		spSlot* slot = mSkeleton->drawOrder [ i ];
-		
-		if ( !slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION)
-			continue;
-		
-		spRegionAttachment *attachment = (spRegionAttachment*) slot->attachment;
-		spRegionAttachment_computeWorldVertices ( attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, vertices );
-		
-		MOAIQuadBrush& quad = mQuads [ i ];
-		quad.SetVerts ( vertices );
-		quad.SetUVs ( attachment->uvs );
-		
-		minX = fmin ( minX, vertices[SP_VERTEX_X1] );
-		minY = fmin ( minY, vertices[SP_VERTEX_Y1] );
-		maxX = fmax ( maxX, vertices[SP_VERTEX_X1] );
-		maxY = fmax ( maxY, vertices[SP_VERTEX_Y1] );
-		minX = fmin ( minX, vertices[SP_VERTEX_X4] );
-		minY = fmin ( minY, vertices[SP_VERTEX_Y4] );
-		maxX = fmax ( maxX, vertices[SP_VERTEX_X4] );
-		maxY = fmax ( maxY, vertices[SP_VERTEX_Y4] );
-		minX = fmin ( minX, vertices[SP_VERTEX_X2] );
-		minY = fmin ( minY, vertices[SP_VERTEX_Y2] );
-		maxX = fmax ( maxX, vertices[SP_VERTEX_X2] );
-		maxY = fmax ( maxY, vertices[SP_VERTEX_Y2] );
-		minX = fmin ( minX, vertices[SP_VERTEX_X3] );
-		minY = fmin ( minY, vertices[SP_VERTEX_Y3] );
-		maxX = fmax ( maxX, vertices[SP_VERTEX_X3] );
-		maxY = fmax ( maxY, vertices[SP_VERTEX_Y3] );
-	}
-	
-	mSkeletonBounds.Init ( minX, maxY, maxX, minY, 0.f, 0.f );
+        if ( !slot->attachment ) {
+            continue;
+        }
+        
+        switch ( slot->attachment->type ) {
+            
+            case SP_ATTACHMENT_BOUNDING_BOX: {
+                spBoundingBoxAttachment *attachment = ( spBoundingBoxAttachment* ) slot->attachment;
+                mVertices.SetTop ( attachment->verticesCount );
+                spBoundingBoxAttachment_computeWorldVertices ( attachment, mSkeleton->x, mSkeleton->y, slot->bone, mVertices );
+                break;
+            }
+                
+            case SP_ATTACHMENT_REGION: {
+                spRegionAttachment *attachment = ( spRegionAttachment* ) slot->attachment;
+                mVertices.SetTop ( 8 );
+                spRegionAttachment_computeWorldVertices ( attachment, mSkeleton->x, mSkeleton->y, slot->bone, mVertices );
+                break;
+            }
+                
+            case SP_ATTACHMENT_MESH: {
+                spMeshAttachment *attachment = ( spMeshAttachment* ) slot->attachment;
+                mVertices.SetTop ( attachment->verticesCount );
+                spMeshAttachment_computeWorldVertices ( attachment, mSkeleton->x, mSkeleton->y, slot, mVertices );
+                break;
+            }
+                
+            case SP_ATTACHMENT_SKINNED_MESH: {
+                spSkinnedMeshAttachment *attachment = ( spSkinnedMeshAttachment* ) slot->attachment;
+                mVertices.SetTop ( attachment->uvsCount );
+                spSkinnedMeshAttachment_computeWorldVertices ( attachment, mSkeleton->x, mSkeleton->y, slot, mVertices );
+                break;
+            }
+                
+            default:
+                break;
+        }
+        
+        for ( u32 i = 0; i < mVertices.GetTop (); i += 2 ) {
+            mSkeletonBounds.Grow ( ZLVec3D ( mVertices [ i ], mVertices [ i + 1 ], 0.0f ));
+        }
+    }
 }
 
 //----------------------------------------------------------------//
 void MOAISpineSkeleton::UpdateSkeleton () {
 	
-	if ( !mSkeleton )
+	if ( !mSkeleton ) {
 		return;
+    }
 	
 	spSkeleton_updateWorldTransform ( mSkeleton );
-	mBoundsDirty = true;
 }
 
 
