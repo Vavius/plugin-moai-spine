@@ -17,19 +17,19 @@ static bool sIsInitialized = false;
 //================================================================//
 int spAtlasFilterToGL( spAtlasFilter filter ) {
 	switch( filter ) {
-		case ATLAS_NEAREST:
+		case SP_ATLAS_NEAREST:
 			return ZGL_SAMPLE_LINEAR;
-		case ATLAS_LINEAR:
+		case SP_ATLAS_LINEAR:
 			return ZGL_SAMPLE_LINEAR;
-		case ATLAS_MIPMAP:
+		case SP_ATLAS_MIPMAP:
 			return ZGL_SAMPLE_LINEAR_MIPMAP_LINEAR;
-		case ATLAS_MIPMAP_NEAREST_NEAREST:
+		case SP_ATLAS_MIPMAP_NEAREST_NEAREST:
 			return ZGL_SAMPLE_NEAREST_MIPMAP_NEAREST;
-		case ATLAS_MIPMAP_LINEAR_NEAREST:
+		case SP_ATLAS_MIPMAP_LINEAR_NEAREST:
 			return ZGL_SAMPLE_LINEAR_MIPMAP_NEAREST;
-		case ATLAS_MIPMAP_NEAREST_LINEAR:
+		case SP_ATLAS_MIPMAP_NEAREST_LINEAR:
 			return ZGL_SAMPLE_NEAREST_MIPMAP_LINEAR;
-		case ATLAS_MIPMAP_LINEAR_LINEAR:
+		case SP_ATLAS_MIPMAP_LINEAR_LINEAR:
 			return ZGL_SAMPLE_LINEAR_MIPMAP_LINEAR;
 	}
 	return ZGL_SAMPLE_LINEAR;

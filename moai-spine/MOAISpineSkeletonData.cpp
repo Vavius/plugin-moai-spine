@@ -24,7 +24,7 @@ int MOAISpineSkeletonData::_load ( lua_State* L ) {
 	cc8* atlasPath = state.GetValue < cc8* >( 3, "" );
 	float scale = state.GetValue < float >( 4, 1.0f );
 	
-	self->mAtlas = spAtlas_readAtlasFile ( atlasPath );
+	self->mAtlas = spAtlas_createFromFile ( atlasPath, 0 );
 	if ( !self->mAtlas ) {
 		MOAILog ( state, MOAILogMessages::MOAI_FileNotFound_S, atlasPath );
 		return 0;

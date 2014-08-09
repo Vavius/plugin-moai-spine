@@ -12,7 +12,7 @@
 // Spine event listener
 //================================================================//
 static void callback (spAnimationState* state, int trackIndex, spEventType type, spEvent* event, int loopCount) {
-	((MOAISpineSkeleton*) state->context )->OnAnimationEvent ( trackIndex, type, event, loopCount );
+	((MOAISpineSkeleton*) state->rendererObject )->OnAnimationEvent ( trackIndex, type, event, loopCount );
 }
 
 //================================================================//
@@ -450,7 +450,7 @@ void MOAISpineSkeleton::Draw ( int subPrimID ) {
 	for ( u32 i = 0; i < size; ++i ) {
 		spSlot* slot = mSkeleton->drawOrder [ i ];
 		
-		if ( !slot->attachment || slot->attachment->type != ATTACHMENT_REGION)
+		if ( !slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION)
 			continue;
 		
 		spRegionAttachment *attachment = (spRegionAttachment*) slot->attachment;
@@ -523,7 +523,7 @@ void MOAISpineSkeleton::Init ( spSkeletonData *skeletonData ) {
 void MOAISpineSkeleton::InitAnimationState ( spAnimationStateData *animData ) {
 	
 	mAnimationState = spAnimationState_create ( animData );
-	mAnimationState->context = this;
+	mAnimationState->rendererObject = this;
 	mAnimationState->listener = callback;
 }
 
@@ -583,21 +583,21 @@ MOAISpineSkeleton::~MOAISpineSkeleton () {
 void MOAISpineSkeleton::OnAnimationEvent ( int trackIndex, spEventType type, spEvent* event, int loopCount ) {
 	MOAIScopedLuaState state = MOAILuaRuntime::Get ().State ();
 	switch ( type ) {
-		case ANIMATION_START:
+		case SP_ANIMATION_START:
 			if ( this->PushListenerAndSelf ( EVENT_ANIMATION_START, state) ) {
 				state.Push ( trackIndex );
 				state.DebugCall ( 2, 0 );
 			}
 			break;
 		
-		case ANIMATION_END:
+		case SP_ANIMATION_END:
 			if ( this->PushListenerAndSelf ( EVENT_ANIMATION_END, state) ) {
 				state.Push ( trackIndex );
 				state.DebugCall ( 2, 0 );
 			}
 			break;
 			
-		case ANIMATION_COMPLETE:
+		case SP_ANIMATION_COMPLETE:
 			if ( this->PushListenerAndSelf ( EVENT_ANIMATION_COMPLETE, state) ) {
 				state.Push ( trackIndex );
 				state.Push ( loopCount );
@@ -605,7 +605,7 @@ void MOAISpineSkeleton::OnAnimationEvent ( int trackIndex, spEventType type, spE
 			}
 			break;
 			
-		case ANIMATION_EVENT:
+		case SP_ANIMATION_EVENT:
 			if ( this->PushListenerAndSelf ( EVENT_ANIMATION_EVENT, state) ) {
 				state.Push ( trackIndex );
 				state.Push ( event->data->name );
@@ -721,7 +721,7 @@ void MOAISpineSkeleton::UpdateBoundsAndQuads () {
 	for ( u32 i = 0; i < size; ++i ) {
 		spSlot* slot = mSkeleton->drawOrder [ i ];
 		
-		if ( !slot->attachment || slot->attachment->type != ATTACHMENT_REGION)
+		if ( !slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION)
 			continue;
 		
 		spRegionAttachment *attachment = (spRegionAttachment*) slot->attachment;
@@ -731,22 +731,22 @@ void MOAISpineSkeleton::UpdateBoundsAndQuads () {
 		quad.SetVerts ( vertices );
 		quad.SetUVs ( attachment->uvs );
 		
-		minX = fmin ( minX, vertices[VERTEX_X1] );
-		minY = fmin ( minY, vertices[VERTEX_Y1] );
-		maxX = fmax ( maxX, vertices[VERTEX_X1] );
-		maxY = fmax ( maxY, vertices[VERTEX_Y1] );
-		minX = fmin ( minX, vertices[VERTEX_X4] );
-		minY = fmin ( minY, vertices[VERTEX_Y4] );
-		maxX = fmax ( maxX, vertices[VERTEX_X4] );
-		maxY = fmax ( maxY, vertices[VERTEX_Y4] );
-		minX = fmin ( minX, vertices[VERTEX_X2] );
-		minY = fmin ( minY, vertices[VERTEX_Y2] );
-		maxX = fmax ( maxX, vertices[VERTEX_X2] );
-		maxY = fmax ( maxY, vertices[VERTEX_Y2] );
-		minX = fmin ( minX, vertices[VERTEX_X3] );
-		minY = fmin ( minY, vertices[VERTEX_Y3] );
-		maxX = fmax ( maxX, vertices[VERTEX_X3] );
-		maxY = fmax ( maxY, vertices[VERTEX_Y3] );
+		minX = fmin ( minX, vertices[SP_VERTEX_X1] );
+		minY = fmin ( minY, vertices[SP_VERTEX_Y1] );
+		maxX = fmax ( maxX, vertices[SP_VERTEX_X1] );
+		maxY = fmax ( maxY, vertices[SP_VERTEX_Y1] );
+		minX = fmin ( minX, vertices[SP_VERTEX_X4] );
+		minY = fmin ( minY, vertices[SP_VERTEX_Y4] );
+		maxX = fmax ( maxX, vertices[SP_VERTEX_X4] );
+		maxY = fmax ( maxY, vertices[SP_VERTEX_Y4] );
+		minX = fmin ( minX, vertices[SP_VERTEX_X2] );
+		minY = fmin ( minY, vertices[SP_VERTEX_Y2] );
+		maxX = fmax ( maxX, vertices[SP_VERTEX_X2] );
+		maxY = fmax ( maxY, vertices[SP_VERTEX_Y2] );
+		minX = fmin ( minX, vertices[SP_VERTEX_X3] );
+		minY = fmin ( minY, vertices[SP_VERTEX_Y3] );
+		maxX = fmax ( maxX, vertices[SP_VERTEX_X3] );
+		maxY = fmax ( maxY, vertices[SP_VERTEX_Y3] );
 	}
 	
 	mSkeletonBounds.Init ( minX, maxY, maxX, minY, 0.f, 0.f );
