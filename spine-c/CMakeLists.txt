@@ -8,6 +8,7 @@ project ( spine )
     file ( GLOB SPINE_SOURCES 
         "${SPINE_SOURCE_DIR}/src/spine/*.c" 
         "${SPINE_SOURCE_DIR}/src/spine/*.h" 
+        "${SPINE_SOURCE_DIR}/include/spine/*.h" 
     )
 
 add_library(spine STATIC ${SPINE_SOURCES})
