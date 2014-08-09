@@ -534,12 +534,12 @@ bool MOAISpineSkeleton::IsDone () {
 
 //----------------------------------------------------------------//
 MOAISpineSkeleton::MOAISpineSkeleton ():
-	mSkeleton ( 0 ),
-	mAnimationState ( 0 ),
-	mDebugBones ( false ),
 	mDebugSlots ( false ),
-	mBoundsDirty ( true ),
-	mRootBone ( 0 ) {
+    mDebugBones ( false ),
+    mBoundsDirty ( true ),
+    mSkeleton ( 0 ),
+    mAnimationState ( 0 ),
+    mRootBone ( 0 ) {
 	
 	RTTI_BEGIN
 		RTTI_EXTEND ( MOAIProp )
