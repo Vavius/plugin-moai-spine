@@ -42,21 +42,21 @@ void _spAtlasPage_createTexture ( spAtlasPage* self, const char* path ) {
 	
 	if ( MOAILuaRuntime::IsValid () && createTextureRef ) {
 		
-        MOAIScopedLuaState state = createTextureRef.GetSelf();
-        
-        state.Push ( path );
-        state.Push ( spAtlasFilterToGL(self->minFilter) );
-        state.Push ( spAtlasFilterToGL(self->magFilter) );
-        state.DebugCall ( 3, 1 );
-        
-        texture = state.GetLuaObject < MOAITexture >( -1, true );
-    }
-    else {
-        
-        texture = new MOAITexture();
-        texture->Init ( path, MOAIImageTransform::TRUECOLOR | MOAIImageTransform::PREMULTIPLY_ALPHA );
-        texture->SetFilter ( spAtlasFilterToGL (self->minFilter), spAtlasFilterToGL (self->magFilter) );
-    }
+		MOAIScopedLuaState state = createTextureRef.GetSelf();
+		
+		state.Push ( path );
+		state.Push ( spAtlasFilterToGL(self->minFilter) );
+		state.Push ( spAtlasFilterToGL(self->magFilter) );
+		state.DebugCall ( 3, 1 );
+		
+		texture = state.GetLuaObject < MOAITexture >( -1, true );
+	}
+	else {
+		
+		texture = new MOAITexture();
+		texture->Init ( path, MOAIImageTransform::TRUECOLOR | MOAIImageTransform::PREMULTIPLY_ALPHA );
+		texture->SetFilter ( spAtlasFilterToGL (self->minFilter), spAtlasFilterToGL (self->magFilter) );
+	}
 	
 	self->rendererObject = texture;
 	self->width = texture->GetWidth ();
