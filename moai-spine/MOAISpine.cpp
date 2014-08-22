@@ -13,7 +13,7 @@
 /**	@name	setCreateTexture
  @text	Create texture for spine atlas page.
  
-		signature: MOAITexture createTexture ( string path )
+		signature: MOAITexture createTexture ( string path, min_filter, mag_filter )
  
  @out	nil
  */

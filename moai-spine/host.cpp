@@ -83,7 +83,7 @@ char* _spUtil_readFile (const char* path, int* length) {
 			state.Push ( path );
 			state.DebugCall ( 1, 1 );
 			
-			path = state.GetValue ( -1, path );
+			path = state.GetValue < cc8* >( -1, path );
 			return _readFile ( path, length );
 		}
 	}

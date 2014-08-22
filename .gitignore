@@ -1,0 +1,9 @@
+Thumbs.db
+.DS_Store
+
+# Artifacts when building with CMake
+CMakeFiles
+CMakeCache.txt
+cmake_install.cmake
+*.o
+*.a
