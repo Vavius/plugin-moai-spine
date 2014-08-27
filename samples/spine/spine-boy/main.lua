@@ -28,7 +28,7 @@ spineboy:init(spineboyData)
 spineboy:setFlip(false, true)
 spineboy:setToSetupPose()
 spineboy:initAnimationState()
-spineboy:setAnimation (0, "walk", true, 0)
+spineboy:setAnimation (1, "walk", true)
 
 spineboy:start()
 spineboy:setLoc(0, 100, 0)

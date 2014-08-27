@@ -29,7 +29,7 @@ goblins:setFlip(false, true)
 goblins:setToSetupPose()
 goblins:setSkin("goblin")
 goblins:initAnimationState()
-goblins:setAnimation (0, "walk", true, 0)
+goblins:setAnimation (1, "walk", true)
 
 goblins:start()
 goblins:setLoc(0, 100, 0)

@@ -58,11 +58,12 @@ private:
 	static int		_setAnimation			( lua_State* L );
 	static int		_setAttachment			( lua_State* L );
 	static int		_setBonesToSetupPose	( lua_State* L );
-	static int		_setComputeBounds       ( lua_State* L );
+	static int		_setComputeBounds		( lua_State* L );
 	static int		_setFlip				( lua_State* L );
 	static int		_setMix					( lua_State* L );
 	static int		_setSkin				( lua_State* L );
 	static int		_setSlotsToSetupPose	( lua_State* L );
+	static int		_setTime				( lua_State* L );
 	static int		_setToSetupPose			( lua_State* L );
 	
 public:
@@ -96,7 +97,7 @@ public:
 	void			OnUpdate				( float step );
 	void			RegisterLuaClass		( MOAILuaState& state );
 	void			RegisterLuaFuncs		( MOAILuaState& state );
-	void			SetAnimation			( int trackId, cc8* name, bool loop, float delay );
+	void			SetAnimation			( int trackId, cc8* name, bool loop );
 	void			SetMix					( cc8* fromName, cc8* toName, float duration );
 	void			UpdateBounds            ();
 	void			UpdateSkeleton			();

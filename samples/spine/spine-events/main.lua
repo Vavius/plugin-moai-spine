@@ -51,5 +51,5 @@ spineboy:setListener(MOAISpineSkeleton.EVENT_ANIMATION_EVENT, function(self, tra
     print("Event", self, trackIndex, "int " .. tostring(intVal), "float " .. tostring(floatVal), "str " .. strVal)
 end)
 
-spineboy:setAnimation (0, "walk", true, 0)
+spineboy:setAnimation (1, "walk", true)
 spineboy:start()

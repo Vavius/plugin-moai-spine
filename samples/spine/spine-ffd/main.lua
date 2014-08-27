@@ -31,7 +31,7 @@ goblins:setFlip(false, true)
 goblins:setToSetupPose()
 goblins:setSkin("goblin")
 goblins:initAnimationState()
-goblins:setAnimation (0, "walk", true, 0)
+goblins:setAnimation (1, "walk", true)
 
 -- By default MOAISpineSkeleton uses cached bounds for better performance. 
 -- Bounds are recomputed: 

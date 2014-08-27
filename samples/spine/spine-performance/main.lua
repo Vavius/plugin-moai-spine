@@ -46,7 +46,7 @@ function makeDragon(layer)
     dragon:init(GetSkeletonData("dragon/dragon.json", "dragon/dragon.atlas", 1 ))
     dragon:setToSetupPose()
     dragon:initAnimationState()
-    dragon:setAnimation (0, "flying", true, 0)
+    dragon:setAnimation (1, "flying", true)
 
     dragon:start()
 
