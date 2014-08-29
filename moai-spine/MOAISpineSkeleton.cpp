@@ -438,8 +438,9 @@ int MOAISpineSkeleton::_setToSetupPose ( lua_State* L ) {
 void MOAISpineSkeleton::AddAnimation ( int trackId, cc8* name, bool loop, float delay ) {
 	spAnimation* anim = spSkeletonData_findAnimation ( mSkeleton->data, name );
 	
-	assert ( anim );
-	spAnimationState_addAnimation ( mAnimationState, trackId, anim, loop, delay );
+    if ( anim ) {
+        spAnimationState_addAnimation ( mAnimationState, trackId, anim, loop, delay );
+    }
 }
 
 //----------------------------------------------------------------//
@@ -833,8 +834,9 @@ void MOAISpineSkeleton::RegisterLuaFuncs ( MOAILuaState& state ) {
 void MOAISpineSkeleton::SetAnimation ( int trackId, cc8* name, bool loop ) {
 	spAnimation* anim = spSkeletonData_findAnimation ( mSkeleton->data, name );
 	
-	assert ( anim );
-	spAnimationState_setAnimation ( mAnimationState, trackId, anim, loop);
+	if ( anim != 0 ) {
+        spAnimationState_setAnimation ( mAnimationState, trackId, anim, loop);
+    }
 }
 
 //----------------------------------------------------------------//
@@ -842,9 +844,9 @@ void MOAISpineSkeleton::SetMix ( cc8* fromName, cc8* toName, float duration ) {
 	spAnimation* fromAnim = spSkeletonData_findAnimation ( mSkeleton->data, fromName );
 	spAnimation* toAnim = spSkeletonData_findAnimation ( mSkeleton->data, toName );
 	
-	assert ( fromAnim );
-	assert ( toAnim );
-	spAnimationStateData_setMix ( mAnimationState->data, fromAnim, toAnim, duration );
+    if ( fromAnim != 0 && toAnim != 0 ) {
+        spAnimationStateData_setMix ( mAnimationState->data, fromAnim, toAnim, duration );
+    }
 }
 
 //----------------------------------------------------------------//
