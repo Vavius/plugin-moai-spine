@@ -42,11 +42,11 @@ int MOAISpineSkeleton::_addAnimation ( lua_State *L ) {
 		MOAIPrint ( "MOAISpineSkeleton not initialized \n" );
 		return 0;
 	}
-    if ( trackId < 0 ) {
+	if ( trackId < 0 ) {
 		MOAIPrint ( "Track id is less than 1. Indexing starts with 1 \n" );
 		return 0;
-    }
-    
+	}
+	
 	self->AddAnimation ( trackId, name, loop, delay );
 	return 0;
 }
@@ -84,11 +84,11 @@ int MOAISpineSkeleton::_clearTrack ( lua_State *L ) {
 		MOAIPrint ( "MOAISpineSkeleton not initialized \n" );
 		return 0;
 	}
-    if ( trackId < 0 ) {
+	if ( trackId < 0 ) {
 		MOAIPrint ( "Track id is less than 1. Indexing starts with 1 \n" );
 		return 0;
-    }
-    
+	}
+	
 	self->ClearTrack ( trackId );
 	return 0;
 }
@@ -214,11 +214,11 @@ int MOAISpineSkeleton::_setAnimation ( lua_State *L ) {
 		MOAIPrint ( "MOAISpineSkeleton not initialized (ensure that initAnimationState was called) \n" );
 		return 0;
 	}
-    if ( trackId < 0 ) {
+	if ( trackId < 0 ) {
 		MOAIPrint ( "Track id is less than 1. Indexing starts with 1 \n" );
 		return 0;
-    }
-    
+	}
+	
 	self->SetAnimation ( trackId, name, loop );
 	return 0;
 }
@@ -382,33 +382,33 @@ int MOAISpineSkeleton::_setSlotsToSetupPose	( lua_State* L ) {
 
 //----------------------------------------------------------------//
 /**	@name	setTime
-    @text   Set time for given animation track
-    
-    @in		MOAISpineSkeleton self
-    @in     number  track id
-    @in     number  time
-    @out	nil
+	@text   Set time for given animation track
+	
+	@in		MOAISpineSkeleton self
+	@in     number  track id
+	@in     number  time
+	@out	nil
 */
 int MOAISpineSkeleton::_setTime ( lua_State *L ) {
-    MOAI_LUA_SETUP ( MOAISpineSkeleton, "UNN" );
-    
-    int trackId = state.GetValue ( 2, 1 ) - 1;
-    float time = state.GetValue < float >( 3, 0.0f );
-    
-    if ( !self->mSkeleton || !self->mAnimationState ) {
+	MOAI_LUA_SETUP ( MOAISpineSkeleton, "UNN" );
+	
+	int trackId = state.GetValue ( 2, 1 ) - 1;
+	float time = state.GetValue < float >( 3, 0.0f );
+	
+	if ( !self->mSkeleton || !self->mAnimationState ) {
 		MOAIPrint ( "MOAISpineSkeleton not initialized (ensure that initAnimationState was called) \n" );
 		return 0;
 	}
-    if ( trackId < 0 ) {
+	if ( trackId < 0 ) {
 		MOAIPrint ( "Track id is less than 1. Indexing starts with 1 \n" );
 		return 0;
-    }
-    
-    spTrackEntry* trackEntry = spAnimationState_getCurrent ( self->mAnimationState, trackId );
-    if ( trackEntry ) {
-        trackEntry->time = time;
-    }
-    return 0;
+	}
+	
+	spTrackEntry* trackEntry = spAnimationState_getCurrent ( self->mAnimationState, trackId );
+	if ( trackEntry ) {
+		trackEntry->time = time;
+	}
+	return 0;
 }
 
 //----------------------------------------------------------------//
@@ -438,9 +438,9 @@ int MOAISpineSkeleton::_setToSetupPose ( lua_State* L ) {
 void MOAISpineSkeleton::AddAnimation ( int trackId, cc8* name, bool loop, float delay ) {
 	spAnimation* anim = spSkeletonData_findAnimation ( mSkeleton->data, name );
 	
-    if ( anim ) {
-        spAnimationState_addAnimation ( mAnimationState, trackId, anim, loop, delay );
-    }
+	if ( anim ) {
+		spAnimationState_addAnimation ( mAnimationState, trackId, anim, loop, delay );
+	}
 }
 
 //----------------------------------------------------------------//
@@ -487,6 +487,7 @@ void MOAISpineSkeleton::Draw ( int subPrimID ) {
 	UNUSED ( subPrimID );
 	
 	if ( !this->IsVisible () ) return;
+	if ( !this->mSkeleton ) return;
 		
 	MOAIGfxDevice& gfxDevice = MOAIGfxDevice::Get ();
 	
@@ -822,7 +823,7 @@ void MOAISpineSkeleton::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "setMix", 				_setMix },
 		{ "setSkin", 				_setSkin },
 		{ "setSlotsToSetupPose", 	_setSlotsToSetupPose },
-        { "setTime",                _setTime },
+		{ "setTime",                _setTime },
 		{ "setToSetupPose", 		_setToSetupPose },
 		{ NULL, NULL }
 	};
@@ -835,8 +836,8 @@ void MOAISpineSkeleton::SetAnimation ( int trackId, cc8* name, bool loop ) {
 	spAnimation* anim = spSkeletonData_findAnimation ( mSkeleton->data, name );
 	
 	if ( anim != 0 ) {
-        spAnimationState_setAnimation ( mAnimationState, trackId, anim, loop);
-    }
+		spAnimationState_setAnimation ( mAnimationState, trackId, anim, loop);
+	}
 }
 
 //----------------------------------------------------------------//
@@ -844,9 +845,9 @@ void MOAISpineSkeleton::SetMix ( cc8* fromName, cc8* toName, float duration ) {
 	spAnimation* fromAnim = spSkeletonData_findAnimation ( mSkeleton->data, fromName );
 	spAnimation* toAnim = spSkeletonData_findAnimation ( mSkeleton->data, toName );
 	
-    if ( fromAnim != 0 && toAnim != 0 ) {
-        spAnimationStateData_setMix ( mAnimationState->data, fromAnim, toAnim, duration );
-    }
+	if ( fromAnim != 0 && toAnim != 0 ) {
+		spAnimationStateData_setMix ( mAnimationState->data, fromAnim, toAnim, duration );
+	}
 }
 
 //----------------------------------------------------------------//

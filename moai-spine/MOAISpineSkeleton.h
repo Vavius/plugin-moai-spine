@@ -10,15 +10,6 @@ class MOAISpineBone;
 class MOAISpineSlot;
 class MOAISpineSkeletonData;
 
-//================================================================//
-// MOAISpineLink
-//================================================================//
-class MOAISpineAttr {
-public:
-	void* mSpineTarget;
-	u32 mAttrID;
-};
-
 
 //================================================================//
 // MOAISpineSkeleton
