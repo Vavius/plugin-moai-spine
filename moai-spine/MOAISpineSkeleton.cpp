@@ -22,6 +22,7 @@ static void callback (spAnimationState* state, int trackIndex, spEventType type,
 
 //----------------------------------------------------------------//
 /**	@name	addAnimation
+    @text   Append another animation to animation track.
  
 	@in		MOAISpineSkeleton self
 	@in		number	track Id
@@ -31,7 +32,7 @@ static void callback (spAnimationState* state, int trackIndex, spEventType type,
 	@out	nil
  */
 int MOAISpineSkeleton::_addAnimation ( lua_State *L ) {
-	MOAI_LUA_SETUP( MOAISpineSkeleton, "UNSBN" )
+	MOAI_LUA_SETUP( MOAISpineSkeleton, "UNS" )
 	
 	int trackId = state.GetValue < int >( 2, 0 ) - 1;
 	cc8* name = state.GetValue < cc8* >( 3, "");
@@ -117,6 +118,33 @@ int MOAISpineSkeleton::_getBone ( lua_State *L ) {
 	self->AffirmBoneHierarchy ( bone );
 	self->mBoneTransformMap [ boneName ]->PushLuaUserdata ( state );
 	return 1;
+}
+
+//----------------------------------------------------------------//
+/**	@name	getDuration
+    @text   Returns animation duration
+ 
+    @in		MOAISpineSkeleton self
+    @in		string	animation name
+    @out	number	duration
+*/
+int MOAISpineSkeleton::_getDuration ( lua_State *L ) {
+	MOAI_LUA_SETUP ( MOAISpineSkeleton, "US" );
+    
+    cc8* animationName = state.GetValue < cc8* >( 2, "" );
+    if ( !self->mSkeleton ) {
+        MOAIPrint ( "MOAISpineSkeleton not initialized \n" );
+		return 0;
+    }
+    
+    spAnimation* animation = spSkeletonData_findAnimation ( self->mSkeleton->data, animationName );
+    if ( !animation ) {
+        MOAIPrint ( "MOAISpineSkeleton: animation not found \n" );
+		return 0;
+    }
+    state.Push ( animation->duration );
+    
+    return 1;
 }
 
 //----------------------------------------------------------------//
@@ -308,7 +336,7 @@ int MOAISpineSkeleton::_setFlip ( lua_State *L ) {
 		it->second->mFlipX = flipX;
 		it->second->mFlipY = flipY;
 	}
-	
+    
 	return 0;
 }
 
@@ -322,7 +350,7 @@ int MOAISpineSkeleton::_setFlip ( lua_State *L ) {
 	@out	nil
 */
 int MOAISpineSkeleton::_setMix ( lua_State *L ) {
-	MOAI_LUA_SETUP ( MOAISpineSkeleton, "USSN" );
+	MOAI_LUA_SETUP ( MOAISpineSkeleton, "USS" );
 	
 	cc8* fromName = state.GetValue < cc8* >( 2, "" );
 	cc8* toName   = state.GetValue < cc8* >( 3, "" );
@@ -812,6 +840,7 @@ void MOAISpineSkeleton::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "clearAllTracks", 		_clearAllTracks },
 		{ "clearTrack", 			_clearTrack },
 		{ "getBone",				_getBone },
+        { "getDuration",            _getDuration },
 		{ "getSlot",				_getSlot },
 		{ "init", 					_init },
 		{ "initAnimationState", 	_initAnimationState },

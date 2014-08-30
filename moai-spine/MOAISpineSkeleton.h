@@ -43,6 +43,7 @@ private:
 	static int		_clearAllTracks			( lua_State* L );
 	static int		_clearTrack				( lua_State* L );
 	static int		_getBone				( lua_State* L );
+    static int      _getDuration            ( lua_State* L );
 	static int		_getSlot				( lua_State* L );
 	static int		_init					( lua_State* L );
 	static int		_initAnimationState		( lua_State* L );
