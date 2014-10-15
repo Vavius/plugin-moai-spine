@@ -256,11 +256,11 @@ int MOAISpineSkeleton::_setAnimation ( lua_State *L ) {
  
 	@in		MOAISpineSkeleton self
 	@in		string	slotName
-	@in		string	attachmentName
+	@in		string	attachmentName or nil to disable attachment
 	@out	bool	success
 */
 int MOAISpineSkeleton::_setAttachment ( lua_State* L ) {
-	MOAI_LUA_SETUP ( MOAISpineSkeleton, "USS" );
+	MOAI_LUA_SETUP ( MOAISpineSkeleton, "US" );
 	
 	cc8* slotName = state.GetValue < cc8* >( 2, 0 );
 	cc8* attachmentName = state.GetValue < cc8* >( 3, 0 );
@@ -626,7 +626,8 @@ void MOAISpineSkeleton::Draw ( int subPrimID ) {
 		g = mSkeleton->g * slot->g * g;
 		b = mSkeleton->b * slot->b * b;
 		
-		ZLColorVec slotColor (r, g, b, a);
+        // premultiply alpha
+		ZLColorVec slotColor (r * a, g * a, b * a, a);
 		ZLColorVec baseColor = this->mColor;
 		slotColor.Modulate ( baseColor );
 		gfxDevice.SetPenColor ( slotColor );
