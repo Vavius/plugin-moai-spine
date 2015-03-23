@@ -18,7 +18,7 @@ class MOAISpineSkeletonData;
 	@text	Special prop for drawing animated spine characters
 */
 class MOAISpineSkeleton :
-	public MOAIProp,
+	public MOAIGraphicsProp,
 	public MOAIAction {
 private:
 	
@@ -57,7 +57,13 @@ private:
 	static int		_setSlotsToSetupPose	( lua_State* L );
 	static int		_setTime				( lua_State* L );
 	static int		_setToSetupPose			( lua_State* L );
-	
+        
+protected:
+	//----------------------------------------------------------------//
+	void			OnDepNodeUpdate			();
+    u32				OnGetModelBounds		( ZLBox& bounds );
+    void			OnUpdate				( double step );
+        
 public:
 	
 	DECL_LUA_FACTORY ( MOAISpineSkeleton )
@@ -75,9 +81,8 @@ public:
 	void			AffirmBoneHierarchy		( spBone* bone );
 	void			ClearAllTracks			();
 	void			ClearTrack				( int trackId );
-	void			Draw					( int subPrimID );
-	void			DrawDebug				( int subPrimID );
-	u32				GetPropBounds			( ZLBox& bounds );
+	void			Draw					( int subPrimID, float lod );
+	void			DrawDebug				( int subPrimID, float lod );
 	void			Init					( spSkeletonData* skeletonData );
 	void			InitAnimationState		( spAnimationStateData* animData );
 	bool			IsDone					();
@@ -85,8 +90,7 @@ public:
 					~MOAISpineSkeleton		();
 	
 	void			OnAnimationEvent		( int trackIndex, spEventType type, spEvent* event, int loopCount );
-	void			OnDepNodeUpdate			();
-	void			OnUpdate				( float step );
+
 	void			RegisterLuaClass		( MOAILuaState& state );
 	void			RegisterLuaFuncs		( MOAILuaState& state );
 	void			SetAnimation			( int trackId, cc8* name, bool loop );

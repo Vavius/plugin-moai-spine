@@ -64,22 +64,22 @@ bool MOAISpineSlot::ApplyAttrOp ( u32 attrID, MOAIAttrOp& attrOp, u32 op ) {
 		switch ( UNPACK_ATTR ( attrID )) {
 			case MOAIColor::ATTR_R_COL: {
 				if ( mLocked ) break;
-				mSlot->r = attrOp.Apply ( mSlot->r, op, MOAIAttrOp::ATTR_READ_WRITE );
+				mSlot->r = attrOp.Apply ( mSlot->r, op, MOAIAttrOp::ATTR_READ_WRITE, MOAIAttrOp::ATTR_TYPE_FLOAT );
 				return true;
 			}
 			case MOAIColor::ATTR_G_COL: {
 				if ( mLocked ) break;
-				mSlot->g = attrOp.Apply ( mSlot->g, op, MOAIAttrOp::ATTR_READ_WRITE );
+				mSlot->g = attrOp.Apply ( mSlot->g, op, MOAIAttrOp::ATTR_READ_WRITE, MOAIAttrOp::ATTR_TYPE_FLOAT );
 				return true;
 			}
 			case MOAIColor::ATTR_B_COL: {
 				if ( mLocked ) break;
-				mSlot->b = attrOp.Apply ( mSlot->b, op, MOAIAttrOp::ATTR_READ_WRITE );
+				mSlot->b = attrOp.Apply ( mSlot->b, op, MOAIAttrOp::ATTR_READ_WRITE, MOAIAttrOp::ATTR_TYPE_FLOAT );
 				return true;
 			}
 			case MOAIColor::ATTR_A_COL: {
 				if ( mLocked ) break;
-				mSlot->a = attrOp.Apply ( mSlot->a, op, MOAIAttrOp::ATTR_READ_WRITE );
+				mSlot->a = attrOp.Apply ( mSlot->a, op, MOAIAttrOp::ATTR_READ_WRITE, MOAIAttrOp::ATTR_TYPE_FLOAT );
 				return true;
 			}
 		}

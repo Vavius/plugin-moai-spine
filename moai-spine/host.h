@@ -9,8 +9,8 @@
 
 #include <moai-core/host.h>
 
-AKU_API void	MOAISpineAppInitialize		();
-AKU_API void	MOAISpineContextInitialize  ();
-AKU_API void	MOAISpineAppFinalize		();
+AKU_API void	AKUSpineAppInitialize		();
+AKU_API void	AKUSpineContextInitialize   ();
+AKU_API void	AKUSpineAppFinalize         ();
 
 #endif

@@ -91,18 +91,18 @@ char* _spUtil_readFile (const char* path, int* length) {
 }
 
 //----------------------------------------------------------------//
-void MOAISpineAppFinalize () {
+void AKUSpineAppFinalize () {
 	
 	if ( !sIsInitialized ) return;
 	sIsInitialized = false;
 }
 
-void MOAISpineAppInitialize () {
+void AKUSpineAppInitialize () {
 
 }
 
 //----------------------------------------------------------------//
-void MOAISpineContextInitialize () {
+void AKUSpineContextInitialize () {
 
 	if ( !sIsInitialized ) {
 		sIsInitialized = true;
