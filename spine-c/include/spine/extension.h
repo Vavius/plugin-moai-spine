@@ -57,10 +57,24 @@
 /* Allocates a new char[], assigns it to TO, and copies FROM to it. Can be used on const types. */
 #define MALLOC_STR(TO,FROM) strcpy(CONST_CAST(char*, TO) = (char*)MALLOC(char, strlen(FROM) + 1), FROM)
 
+#define PI 3.1415926535897932385f
+#define DEG_RAD (PI / 180)
+#define RAD_DEG (180 / PI)
+
 #ifdef __STDC_VERSION__
 #define FMOD(A,B) fmodf(A, B)
+#define ATAN2(A,B) atan2f(A, B)
+#define SIN(A) sinf(A)
+#define COS(A) cosf(A)
+#define SQRT(A) sqrtf(A)
+#define ACOS(A) acosf(A)
 #else
 #define FMOD(A,B) (float)fmod(A, B)
+#define ATAN2(A,B) (float)atan2(A, B)
+#define COS(A) (float)cos(A)
+#define SIN(A) (float)sin(A)
+#define SQRT(A) (float)sqrt(A)
+#define ACOS(A) (float)acos(A)
 #endif
 
 #include <stdlib.h>
@@ -110,12 +124,21 @@ char* _readFile (const char* path, int* length);
 
 /**/
 
-typedef struct {
+typedef struct _spAnimationState {
 	spAnimationState super;
 	spEvent** events;
 
 	spTrackEntry* (*createTrackEntry) (spAnimationState* self);
 	void (*disposeTrackEntry) (spTrackEntry* entry);
+
+#ifdef __cplusplus
+	_spAnimationState() :
+		super(),
+		events(0),
+		createTrackEntry(0),
+		disposeTrackEntry(0) {
+	}
+#endif
 } _spAnimationState;
 
 spTrackEntry* _spTrackEntry_create (spAnimationState* self);
@@ -154,7 +177,7 @@ void _spAttachment_deinit (spAttachment* self);
 void _spTimeline_init (spTimeline* self, spTimelineType type, /**/
 void (*dispose) (spTimeline* self), /**/
 		void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
-				int* eventCount, float alpha));
+				int* eventsCount, float alpha));
 void _spTimeline_deinit (spTimeline* self);
 
 #ifdef SPINE_SHORT_NAMES
@@ -164,10 +187,10 @@ void _spTimeline_deinit (spTimeline* self);
 
 /**/
 
-void _spCurveTimeline_init (spCurveTimeline* self, spTimelineType type, int frameCount, /**/
+void _spCurveTimeline_init (spCurveTimeline* self, spTimelineType type, int framesCount, /**/
 void (*dispose) (spTimeline* self), /**/
 		void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
-				int* eventCount, float alpha));
+				int* eventsCount, float alpha));
 void _spCurveTimeline_deinit (spCurveTimeline* self);
 
 #ifdef SPINE_SHORT_NAMES

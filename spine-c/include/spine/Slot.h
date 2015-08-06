@@ -39,11 +39,8 @@
 extern "C" {
 #endif
 
-struct spSkeleton;
-
 typedef struct spSlot {
 	spSlotData* const data;
-	struct spSkeleton* const skeleton;
 	spBone* const bone;
 	float r, g, b, a;
 	spAttachment* const attachment;
@@ -51,9 +48,21 @@ typedef struct spSlot {
 	int attachmentVerticesCapacity;
 	int attachmentVerticesCount;
 	float* attachmentVertices;
+
+#ifdef __cplusplus
+	spSlot() :
+		data(0),
+		bone(0),
+		r(0), b(0), g(0), a(0),
+		attachment(0),
+		attachmentVerticesCapacity(0),
+		attachmentVerticesCount(0),
+		attachmentVertices(0) {
+	}
+#endif
 } spSlot;
 
-spSlot* spSlot_create (spSlotData* data, struct spSkeleton* skeleton, spBone* bone);
+spSlot* spSlot_create (spSlotData* data, spBone* bone);
 void spSlot_dispose (spSlot* self);
 
 /* @param attachment May be 0 to clear the attachment for the slot. */
