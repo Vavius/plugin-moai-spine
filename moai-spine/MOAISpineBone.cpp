@@ -50,35 +50,35 @@ bool MOAISpineBone::ApplyAttrOp ( u32 attrID, MOAIAttrOp& attrOp, u32 op ) {
 			case MOAITransform::ATTR_X_LOC: {
 				if ( mLockFlags & LOCK_LOC ) break;
 				mBone->x = attrOp.Apply ( mBone->x, op, MOAIAttrOp::ATTR_READ_WRITE );
-				spBone_updateWorldTransform ( mBone, mFlipX, mFlipY );
+				spBone_updateWorldTransform ( mBone );
 				return true;
 			}
 				
 			case MOAITransform::ATTR_Y_LOC: {
 				if ( mLockFlags & LOCK_LOC ) break;
 				mBone->y = attrOp.Apply ( mBone->y, op, MOAIAttrOp::ATTR_READ_WRITE );
-				spBone_updateWorldTransform ( mBone, mFlipX, mFlipY );
+				spBone_updateWorldTransform ( mBone );
 				return true;
 			}
 			
 			case MOAITransform::ATTR_Z_ROT: {
 				if ( mLockFlags & LOCK_ROT ) break;
 				mBone->rotation = attrOp.Apply ( mBone->rotation, op, MOAIAttrOp::ATTR_READ_WRITE );
-				spBone_updateWorldTransform ( mBone, mFlipX, mFlipY );
+				spBone_updateWorldTransform ( mBone );
 				return true;
 			}
 				
 			case MOAITransform::ATTR_X_SCL: {
 				if ( mLockFlags & LOCK_SCL ) break;
 				mBone->scaleX = attrOp.Apply ( mBone->scaleX, op, MOAIAttrOp::ATTR_READ_WRITE );
-				spBone_updateWorldTransform ( mBone, mFlipX, mFlipY );
+				spBone_updateWorldTransform ( mBone );
 				return true;
 			}
 				
 			case MOAITransform::ATTR_Y_SCL: {
 				if ( mLockFlags & LOCK_SCL ) break;
 				mBone->scaleY = attrOp.Apply ( mBone->scaleY, op, MOAIAttrOp::ATTR_READ_WRITE );
-				spBone_updateWorldTransform ( mBone, mFlipX, mFlipY );
+				spBone_updateWorldTransform ( mBone );
 				return true;
 			}
 		}
@@ -113,9 +113,7 @@ void MOAISpineBone::LockTransform ( u32 flags ) {
 MOAISpineBone::MOAISpineBone ():
 	mBone ( 0 ),
 	mRootTransform ( 0 ),
-	mLockFlags ( 0 ),
-	mFlipX ( false ),
-	mFlipY ( false ) {
+	mLockFlags ( 0 ) {
 	RTTI_BEGIN
 		RTTI_EXTEND ( MOAITransform )
 	RTTI_END
@@ -143,7 +141,7 @@ void MOAISpineBone::OnDepNodeUpdate () {
 			mBone->scaleY = mScale.mY;
 		}
 		if ( mLockFlags ) {
-			spBone_updateWorldTransform ( mBone, mFlipX, mFlipY );
+			spBone_updateWorldTransform ( mBone );
 		}
 		
 		float parentRot = 0.0f;
@@ -176,12 +174,12 @@ void MOAISpineBone::OnDepNodeUpdate () {
 		}
 		
 		if ( mRootTransform ) {
-			if ( mFlipX ) {
+			if ( mBone->worldFlipX ) {
 				mLocalToWorldMtx.m [ ZLAffine3D::C0_R0 ] *= -1;
 				mLocalToWorldMtx.m [ ZLAffine3D::C0_R1 ] *= -1;
 				mLocalToWorldMtx.m [ ZLAffine3D::C0_R2 ] *= -1;
 			}
-			if ( mFlipY ) {
+			if ( mBone->worldFlipY ) {
 				mLocalToWorldMtx.m [ ZLAffine3D::C1_R0 ] *= -1;
 				mLocalToWorldMtx.m [ ZLAffine3D::C1_R1 ] *= -1;
 				mLocalToWorldMtx.m [ ZLAffine3D::C1_R2 ] *= -1;

@@ -35,10 +35,7 @@ private:
 	};
 		
 public:
-	
-	bool mFlipX;
-	bool mFlipY;
-		
+			
 	DECL_LUA_FACTORY ( MOAISpineBone )
 
 	//----------------------------------------------------------------//
